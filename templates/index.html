@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="jumbotron bg-primary text-white p-5 rounded">
+            <h1 class="display-4"><i class="fas fa-shield-alt"></i> Police Data UK Portal</h1>
+            <p class="lead">Access comprehensive police data from across the UK</p>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-success h-100">
+            <div class="card-body text-center">
+                <h4><i class="fas fa-building"></i></h4>
+                <h5>Police Forces</h5>
+                <p>Explore all UK police forces</p>
+                <a href="{{ url_for('forces') }}" class="btn btn-light">View Forces</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-warning h-100">
+            <div class="card-body text-center">
+                <h4><i class="fas fa-exclamation-triangle"></i></h4>
+                <h5>Crime Data</h5>
+                <p>Street-level crime information</p>
+                <a href="{{ url_for('crimes') }}" class="btn btn-light">Search Crimes</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-info h-100">
+            <div class="card-body text-center">
+                <h4><i class="fas fa-users"></i></h4>
+                <h5>Neighbourhoods</h5>
+                <p>Local policing teams</p>
+                <a href="{{ url_for('neighbourhoods') }}" class="btn btn-light">Explore</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-dark h-100">
+            <div class="card-body text-center">
+                <h4><i class="fas fa-search"></i></h4>
+                <h5>Stop & Search</h5>
+                <p>Stop and search records</p>
+                <a href="{{ url_for('stop_search') }}" class="btn btn-light">View Data</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-search"></i> Quick Crime Search</h5>
+            </div>
+            <div class="card-body">
+                <form id="quick-search">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control mb-2" id="lat" placeholder="Latitude" value="51.5074">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control mb-2" id="lng" placeholder="Longitude" value="-0.1278">
+                        </div>
+                    </div>
+                    <input type="month" class="form-control mb-2" id="date" value="2024-01">
+                    <button type="submit" class="btn btn-primary w-100">Search Crimes</button>
+                </form>
+                <div id="results" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> About</h5>
+            </div>
+            <div class="card-body">
+                <p>This application provides easy access to official UK police data including:</p>
+                <ul>
+                    <li>Police force information</li>
+                    <li>Street-level crime data</li>
+                    <li>Neighbourhood policing</li>
+                    <li>Stop and search records</li>
+                </ul>
+                <p class="mb-0">All data is sourced from the official Police UK API.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('quick-search').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const lat = document.getElementById('lat').value;
+    const lng = document.getElementById('lng').value;
+    const date = document.getElementById('date').value;
+    
+    fetch(`/api/crimes/street?lat=${lat}&lng=${lng}&date=${date}`)
+        .then(r => r.json())
+        .then(crimes => {
+            const results = document.getElementById('results');
+            if (crimes.length > 0) {
+                results.innerHTML = `<div class="alert alert-success">Found ${crimes.length} crimes</div>`;
+            } else {
+                results.innerHTML = '<div class="alert alert-warning">No crimes found</div>';
+            }
+        });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,32 @@
+{
+  "map": {
+    "name": "Interactive Crime Map",
+    "description": "Adds Leaflet.js map with crime visualization",
+    "dependencies": [],
+    "status": "installed"
+  },
+  "analytics": {
+    "name": "Crime Analytics Dashboard",
+    "description": "Adds charts and statistics for crime data",
+    "dependencies": [],
+    "status": "installed"
+  },
+  "export": {
+    "name": "Data Export",
+    "description": "Export crime data to CSV and JSON formats",
+    "dependencies": [],
+    "status": "installed"
+  },
+  "geolocation": {
+    "name": "Geolocation",
+    "description": "Auto-detect user location and nearby crimes",
+    "dependencies": [],
+    "status": "installed"
+  },
+  "mobile": {
+    "name": "Mobile Optimization",
+    "description": "Responsive design for mobile devices",
+    "dependencies": [],
+    "status": "installed"
+  }
+}

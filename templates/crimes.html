@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-exclamation-triangle"></i> Crime Data</h1>
+        <p class="lead">Search for street-level crimes</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <form id="crime-search">
+                    <div class="mb-3">
+                        <label>Latitude</label>
+                        <input type="text" class="form-control" id="lat" value="51.5074">
+                    </div>
+                    <div class="mb-3">
+                        <label>Longitude</label>
+                        <input type="text" class="form-control" id="lng" value="-0.1278">
+                    </div>
+                    <div class="mb-3">
+                        <label>Date (YYYY-MM)</label>
+                        <input type="month" class="form-control" id="date" value="2024-01">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Search Crimes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <div id="crime-results">
+                    <p class="text-muted">Enter search criteria to find crimes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('crime-search').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const lat = document.getElementById('lat').value;
+    const lng = document.getElementById('lng').value;
+    const date = document.getElementById('date').value;
+    const results = document.getElementById('crime-results');
+    
+    results.innerHTML = '<div class="text-center"><div class="spinner-border"></div></div>';
+    
+    fetch(`/api/crimes/street?lat=${lat}&lng=${lng}&date=${date}`)
+        .then(r => r.json())
+        .then(crimes => {
+            if (crimes.length > 0) {
+                results.innerHTML = `
+                    <div class="alert alert-success">Found ${crimes.length} crimes</div>
+                    <div class="small">
+                        ${crimes.slice(0, 10).map(crime => `
+                            <div class="border-start border-primary ps-2 mb-2">
+                                <strong>${crime.category}</strong><br>
+                                <small>${crime.location.street.name}</small>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                results.innerHTML = '<div class="alert alert-warning">No crimes found</div>';
+            }
+        });
+});
+</script>
+{% endblock %}
