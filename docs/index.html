@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="PoliceDataApp makes UK Police Data API information easier to explore.">
+  <title>PoliceDataApp | UK Police Data Explorer</title>
+  <style>
+    :root{color-scheme:dark;--bg:#08111f;--panel:#101d31;--line:#263954;--ink:#eef5ff;--muted:#9db0c9;--blue:#55a7ff;--cyan:#61e4db}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#12325a 0,transparent 36%),var(--bg);color:var(--ink);font:16px/1.65 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}a{color:inherit}.wrap{max-width:1100px;margin:auto;padding:28px}.nav{display:flex;align-items:center;justify-content:space-between}.brand{font-weight:800;letter-spacing:.3px}.brand span{color:var(--cyan)}.button{display:inline-block;padding:11px 17px;border:1px solid var(--line);border-radius:12px;text-decoration:none;background:#132641}.button.primary{background:linear-gradient(135deg,#1674d1,#15978f);border:0}.hero{padding:96px 0 70px;display:grid;grid-template-columns:1.25fr .75fr;gap:42px;align-items:center}.eyebrow{color:var(--cyan);font-weight:700;text-transform:uppercase;letter-spacing:1.8px;font-size:12px}h1{font-size:clamp(42px,7vw,76px);line-height:1.02;letter-spacing:-2.8px;margin:14px 0 22px}.lead{font-size:20px;color:var(--muted);max-width:680px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}.statbox,.card{background:linear-gradient(180deg,rgba(20,39,67,.95),rgba(11,24,42,.95));border:1px solid var(--line);border-radius:20px}.statbox{padding:26px}.stat{padding:18px 0;border-bottom:1px solid var(--line)}.stat:last-child{border:0}.stat b{display:block;font-size:27px;color:var(--blue)}.stat span{color:var(--muted)}section{padding:34px 0}h2{font-size:32px;letter-spacing:-.8px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{padding:23px}.card h3{margin:0 0 8px}.card p{color:var(--muted);margin:0}.stack{display:flex;gap:9px;flex-wrap:wrap}.tag{border:1px solid var(--line);padding:7px 11px;border-radius:999px;color:#cfe2fa;background:#0d1a2c}footer{margin-top:50px;padding:26px 0;border-top:1px solid var(--line);color:var(--muted);display:flex;justify-content:space-between;gap:20px}@media(max-width:780px){.hero{grid-template-columns:1fr;padding-top:64px}.grid{grid-template-columns:1fr}.nav .button{display:none}h1{letter-spacing:-1.5px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="nav"><div class="brand">Police<span>Data</span>App</div><a class="button" href="https://github.com/JonasAmidu/PoliceDataApp">View source</a></nav>
+    <main>
+      <header class="hero">
+        <div>
+          <div class="eyebrow">UK open data · Flask · REST</div>
+          <h1>UK police data,<br>made approachable.</h1>
+          <p class="lead">A Python data pipeline and web interface for exploring police forces, crime categories, street-level incidents, and stop-and-search records through the official UK Police Data API.</p>
+          <div class="actions"><a class="button primary" href="https://github.com/JonasAmidu/PoliceDataApp#local-setup">Run it locally</a><a class="button" href="https://data.police.uk/docs/">Explore the source API</a></div>
+        </div>
+        <aside class="statbox">
+          <div class="stat"><b>6 REST routes</b><span>Structured Flask endpoints for force and crime data</span></div>
+          <div class="stat"><b>Live public API</b><span>Powered by data.police.uk</span></div>
+          <div class="stat"><b>Open source</b><span>Python, Pandas, HTML, CSS and JavaScript</span></div>
+        </aside>
+      </header>
+      <section><div class="eyebrow">Capabilities</div><h2>From raw API responses to useful views</h2><div class="grid">
+        <article class="card"><h3>Force directory</h3><p>Browse UK police forces, details, and personnel through focused endpoints.</p></article>
+        <article class="card"><h3>Location queries</h3><p>Retrieve street-level crime and stop-and-search data around a latitude and longitude.</p></article>
+        <article class="card"><h3>Clean pipeline</h3><p>Extract, transform, and present public data with structured error handling.</p></article>
+      </div></section>
+      <section><div class="eyebrow">Technology</div><h2>Built for clarity and extension</h2><div class="stack"><span class="tag">Python 3</span><span class="tag">Flask</span><span class="tag">Pandas</span><span class="tag">REST APIs</span><span class="tag">Jinja2</span><span class="tag">JavaScript</span></div></section>
+    </main>
+    <footer><span>PoliceDataApp by Jonas Amidu</span><span>Data supplied by the UK Police Data API</span></footer>
+  </div>
+</body>
+</html>
