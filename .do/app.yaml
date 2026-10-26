@@ -1,0 +1,27 @@
+name: policedataapp
+services:
+  - name: web
+    environment_slug: python
+    github:
+      repo: JonasAmidu/PoliceDataApp
+      branch: main
+      deploy_on_push: true
+    source_dir: /
+    run_command: gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120 --worker-tmp-dir /dev/shm --access-logfile - --error-logfile - app:app
+    http_port: 8080
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-0.5gb
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 10
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+ingress:
+  rules:
+    - component:
+        name: web
+      match:
+        path:
+          prefix: /

@@ -15,6 +15,28 @@ Open http://localhost:5000. Python 3.10 or newer is supported. The web pages loa
 
 The map uses standard OpenStreetMap tiles, with visible attribution and no API key. Normal browser caching is preserved; see the [tile usage policy](https://operations.osmfoundation.org/policies/tiles/).
 
+## Deploy on DigitalOcean App Platform
+
+Deploy the repository as a Python web service, with these component settings:
+
+- **Run Command:** `gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120 --worker-tmp-dir /dev/shm --access-logfile - --error-logfile - app:app`
+- **HTTP Port:** `8080`
+- **HTTP health-check path:** `/health`
+
+The checked-in `Procfile` supplies the same startup configuration for buildpacks. An example App Platform spec is in [.do/app.yaml](.do/app.yaml); when updating an existing app, retain its existing resource settings. Saving this file in GitHub does not change an existing app's component settings automatically. Set the Run Command, HTTP Port, and health check in DigitalOcean, then rebuild and deploy the latest commit. Do not use `python setup.py` as the build or run command; it generates and overwrites application files.
+
+Gunicorn is installed by `requirements.txt`, listens on all interfaces using DigitalOcean's `PORT`, and uses `/dev/shm` for worker temporary files as recommended by the [Python buildpack documentation](https://docs.digitalocean.com/products/app-platform/reference/buildpacks/python/). A single worker keeps the in-memory cache and place-search rate limiter shared between request threads. The server timeout allows upstream requests to finish.
+
+`GET /health` returns `200` with `{"status":"ok"}` and never contacts the police or geocoding APIs. Use it for platform probes so an upstream outage cannot make a running app appear unhealthy. `python app.py` also respects `PORT` when set and defaults to port 5000 for local development, with debugging disabled.
+
+To reproduce the platform startup locally:
+
+```bash
+PORT=8080 sh -c "$(sed 's/^web: //' Procfile)"
+# In another terminal:
+curl --fail http://localhost:8080/health
+```
+
 ## Browser views
 
 - **Dashboard:** search UK postcodes or place names, jump to a city, use your location, or select coordinates on the map. Incidents cluster as you zoom; category filters and the inspector show street names and recorded outcomes.
@@ -61,10 +83,11 @@ Backend and JavaScript regression checks run without upstream network access:
 
 ```bash
 python -m unittest discover -s tests -p 'test_*.py' -v
+python tests/deployment_smoke.py
 node --test tests/test_home_map.js tests/test_subpages.js
 ```
 
-Node.js 22 or newer is required for the JavaScript tests. In restricted environments that prevent test subprocesses, add `--experimental-test-isolation=none` to the Node command.
+The deployment smoke check starts Gunicorn and the Python entrypoint on assigned ports and probes `/health` and `/`; it requires permission to bind local sockets. Node.js 22 or newer is required for the JavaScript tests. In restricted environments that prevent test subprocesses, add `--experimental-test-isolation=none` to the Node command.
 
 Run the combined Chromium browser checks with real Bootstrap, Leaflet, MarkerCluster and Chart.js:
 

@@ -1,4 +1,5 @@
 import math
+import os
 import re
 from datetime import date as calendar_date
 
@@ -64,6 +65,12 @@ def query_filters(default_location=False, allow_force=False):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/health')
+def health():
+    """Report process readiness without calling external data services."""
+    return jsonify(status='ok')
 
 
 @app.route('/forces')
@@ -166,4 +173,4 @@ def api_analytics_summary():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', '5000')))
