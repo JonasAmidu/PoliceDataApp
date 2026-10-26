@@ -1,75 +1,90 @@
 # PoliceDataApp
 
-> Python data pipeline & web interface for the UK Police Data API — automated extraction, transformation, and RESTful delivery.
+A Flask web interface for the [UK Police Data API](https://data.police.uk/docs/), with an interactive crime map, police force directory, neighbourhood profiles, stop-and-search records, and crime analytics.
 
-A Flask-based web application that consumes the [UK Police Data API](https://data.police.uk/docs/) and presents it through a clean, user-friendly interface. Built with Python, Flask, Pandas, and REST API best practices.
-
-## 🎯 Project Overview
-
-- **Data source**: UK Police Data API (data.police.uk)
-- **Purpose**: Make UK police data more accessible and easier to query
-- **Stack**: Python · Flask · Pandas · REST API · HTML/CSS/JavaScript
-- **Pipeline**: Data extraction → transformation → serving via API endpoints
-
-## 📡 API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/forces` | List all police forces |
-| GET | `/api/forces/<force_id>` | Get force details |
-| GET | `/api/forces/<force_id>/people` | Get force personnel |
-| GET | `/api/crime-categories` | List crime categories |
-| GET | `/api/crimes/street?lat=&lng=` | Crimes near location |
-| GET | `/api/stop-search/street` | Stop-and-search records |
-
-## 🔧 Technical Features
-
-- **Flask REST API** — structured endpoint routing with error handling
-- **Pandas** — data transformation and cleaning
-- **Police Data API integration** — external API consumption with request handling
-- **Jinja2 templates** — server-side rendered frontend
-- **Modular architecture** — `utils/police_api.py`, `config.py`, `feature_manager.py`
-
-## 📂 Key Files
-
-```
-PoliceDataApp/
-├── app.py              # Flask application entry point
-├── config.py           # Configuration management
-├── utils/
-│   └── police_api.py   # Police Data API client
-├── templates/          # Jinja2 HTML templates
-├── static/             # CSS & JS assets
-└── requirements.txt    # Python dependencies
-```
-
-## 🚀 Local Setup
+## Run locally
 
 ```bash
-git clone https://github.com/JonasAmidu/PoliceDataApp.git
-cd PoliceDataApp
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 python app.py
-# App runs at http://localhost:5000
 ```
 
-## 🛠️ Tech Stack
+Open http://localhost:5000. Python 3.10 or newer is supported. The web pages load Bootstrap, Leaflet, MarkerCluster and Chart.js from public CDNs, so an internet connection is required. `setup.py` is the original project generator and rewrites application files; use the commands above to run this version.
 
-<div>
+## Browser views
 
-| Component | Technology |
-|-----------|------------|
-| Backend | Python 3, Flask |
-| Data processing | Pandas, Requests |
-| API | RESTful Flask routes |
-| Frontend | HTML, CSS, JavaScript |
-| Templates | Jinja2 |
-| Server | Flask dev server (prod: gunicorn) |
+- **Dashboard:** search UK postcodes or place names, jump to a city, use your location, or select coordinates on the map. Incidents cluster as you zoom; category filters and the inspector show street names and recorded outcomes.
+- **Forces:** search the directory, open a force's contact details in a modal, then follow its neighbourhood link.
+- **Neighbourhoods:** browse and filter local areas, then inspect the overview, policing team, priorities, and events. Partial upstream failures appear as warnings.
+- **Stop & Search:** choose a location or police force and reporting month. View summaries, filter by search object, and page through records, including records without published coordinates.
+- **Analytics:** choose a location and reporting month to view category/outcome charts and the corresponding tables.
 
-</div>
+Month selectors use the latest published crime month. A blank month lets the upstream API choose its latest data. Coverage and publication dates vary by force and dataset; an empty response means no published records for that query. Crime coordinates are anonymised and approximate.
 
-## 👤 Author
+## Application API
 
-**Jonas Amidu** — [github.com/JonasAmidu](https://github.com/JonasAmidu) · jonasamidu@gmail.com
+All endpoints use GET. Successful list endpoints return arrays; details and summary endpoints return objects.
 
-MIT License
+| Endpoint | Description |
+| --- | --- |
+| `/api/forces` | List police forces |
+| `/api/force/<force_id>` | Force details |
+| `/api/force/<force_id>/people` | Force personnel |
+| `/api/crime-categories` | Published crime categories |
+| `/api/crimes/last-updated` | Latest crime publication date, `{ "date": "YYYY-MM-DD" }` |
+| `/api/crimes/street?lat=&lng=&date=YYYY-MM` | Street crimes near coordinates |
+| `/api/geocode/postcode?q=SW1A%201AA` | Postcode lookup, `{ "success": true, "result": { "lat": ..., "lng": ... } }` |
+| `/api/geocode/search?q=Leicester` | UK place matches with `display_name`, `lat`, and `lng` |
+| `/api/neighbourhoods/<force_id>` | Force neighbourhood list |
+| `/api/neighbourhood/<force_id>/<id>` | Composite `details`, `team`, `priorities`, `events`, and `warnings` |
+| `/api/stop-search/street?lat=&lng=&date=YYYY-MM` | Stop-and-search records near coordinates |
+| `/api/stop-search/street?force=leicestershire&date=YYYY-MM` | Force stop-and-search records, including those without locations |
+| `/api/analytics/summary?lat=&lng=&date=YYYY-MM` | Total, category and outcome counts/percentages |
+
+`date` is optional. Crime and analytics queries default to central London when no scope is supplied. Stop-and-search requires either both coordinates or a force; combining a force and coordinates returns 400. Invalid arguments return 400, an unknown postcode returns 404, and upstream failures return 502 with `{ "success": false, "error": "..." }`.
+
+For API consumers, the analytics endpoint also accepts `force`, but this uses the upstream [crimes without a location](https://data.police.uk/docs/method/crimes-no-location/) dataset. Its `scope: "unmapped-crimes-only"` identifies that subset; it is not the total crime count for a force. The dashboard uses local street-level summaries.
+
+## Caching and geocoding
+
+Successful upstream responses, including empty lists, are cached in memory for 600 seconds by default, with at most 1,024 entries. Concurrent police-data queries share cached results. A 429 response receives one bounded retry; failed requests are not cached. Caching reduces repeated requests but cannot guarantee that upstream services will never rate-limit the app.
+
+Postcodes use [Postcodes.io](https://postcodes.io/); place searches use [Nominatim](https://nominatim.org/) and are submitted explicitly, with OpenStreetMap attribution. Nominatim requests are cached and limited to one per second within the application process. For a deployment with multiple workers, coordinate rate limiting across processes or use a suitable geocoding provider. Set `NOMINATIM_SEARCH_URL` to switch to a compatible search service. Follow the provider's [usage policy](https://operations.osmfoundation.org/policies/nominatim/).
+
+## Verification
+
+Backend and JavaScript regression checks run without upstream network access:
+
+```bash
+python -m unittest discover -s tests -p 'test_*.py' -v
+node --test tests/test_home_map.js tests/test_subpages.js
+```
+
+Node.js 22 or newer is required for the JavaScript tests. In restricted environments that prevent test subprocesses, add `--experimental-test-isolation=none` to the Node command.
+
+Run the combined Chromium browser checks with real Bootstrap, Leaflet, MarkerCluster and Chart.js:
+
+```bash
+pip install -r requirements-dev.txt
+python -m playwright install --with-deps chromium
+python tests/browser_smoke.py
+```
+
+The browser suite starts its own Flask server and replaces only upstream HTTP transport with fixed responses. It exercises search, map clustering and filters, inspector escaping, force-to-neighbourhood navigation, profile tabs, stop-search pagination and force queries, analytics charts, empty/error states, and mobile navigation. CDN assets are downloaded once into a temporary cache; tile images are replaced with a fixed image. `POLICE_BROWSER_ASSET_DIR` overrides that cache location; `PLAYWRIGHT_CHROMIUM_EXECUTABLE` selects an existing Chromium executable. The browser checks do not establish current availability of public API or tile servers.
+
+GitHub Actions runs backend tests on Python 3.10–3.12, the JavaScript regression tests, and the Chromium integration suite.
+
+## Structure
+
+```text
+app.py                  Flask page and API routes
+utils/police_api.py      Cached upstream client, geocoding and aggregation
+config.py               Flask configuration
+templates/              Jinja views and shared query form
+static/                 CSS and browser scripts
+tests/                  Backend, JavaScript and browser regression checks
+```
+
+Author: [Jonas Amidu](https://github.com/JonasAmidu). MIT License.

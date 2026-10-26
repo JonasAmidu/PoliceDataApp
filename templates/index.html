@@ -1,95 +1,299 @@
 {% extends "base.html" %}
 
+{% block title %}Police Data UK - Interactive Crime Map & Dashboard{% endblock %}
+
 {% block content %}
+<!-- Leaflet & MarkerCluster CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+
+<!-- Hero Section -->
 <div class="row">
     <div class="col-12">
-        <div class="jumbotron bg-primary text-white p-5 rounded">
-            <h1 class="display-4"><i class="fas fa-shield-alt"></i> Police Data UK Portal</h1>
-            <p class="lead">Access comprehensive police data from across the UK</p>
+        <div class="map-hero mb-4">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <span class="badge bg-light text-dark fw-bold mb-2 px-3 py-2 rounded-pill">
+                        <i class="fas fa-radar text-primary me-1"></i> Published UK Police Data
+                    </span>
+                    <h1 class="display-6 fw-bold mb-2">UK Street-Level Crime Explorer</h1>
+                    <p class="lead mb-0 text-white-50">
+                        Search a UK postcode or place, or select a point on the map to explore published crime incidents and investigation outcomes. Locations are approximate; coverage varies by police force.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <button type="button" class="btn btn-light text-primary fw-bold shadow-sm px-3 py-2 rounded-pill" id="btn-my-location">
+                        <i class="fas fa-location-crosshairs text-primary me-1"></i> Use My Current Location
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="row mt-4">
+<!-- Location Search & Filter Controls -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="search-card">
+            <form id="location-search-form" class="row g-3 align-items-center">
+                <!-- Location Input (Postcode or Place Name) -->
+                <div class="col-lg-6 col-md-12">
+                    <label for="location-search-input" class="form-label small fw-bold text-muted text-uppercase mb-1">
+                        <i class="fas fa-search-location text-primary me-1"></i> Location (UK Postcode or Place)
+                    </label>
+                    <div class="input-group search-input-group">
+                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                        <input type="text"
+                               class="form-control"
+                               id="location-search-input"
+                               placeholder="e.g. SW1A 1AA, M1 1AE, Westminster, Manchester..."
+                               value="London (Westminster)"
+                               autocomplete="off">
+                    </div>
+                </div>
+
+                <!-- Date Selector (Month) -->
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label small fw-bold text-muted text-uppercase mb-1">
+                        <i class="fas fa-calendar-alt text-primary me-1"></i> Reporting Period
+                    </label>
+                    <div class="input-group search-input-group">
+                        <span class="input-group-text"><i class="far fa-calendar"></i></span>
+                        <input type="month" class="form-control" id="date-select" min="2010-12" aria-label="Reporting month">
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="col-lg-3 col-md-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm" id="btn-search-crimes">
+                        <i class="fas fa-magnifying-glass me-1"></i> Search Crimes
+                    </button>
+                </div>
+            </form>
+
+            <div id="map-feedback" class="alert alert-danger d-none mt-3 mb-0" role="alert"></div>
+            <p class="small text-muted mt-2 mb-0">Place search uses <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a> via Nominatim. Crime locations are anonymised and approximate.</p>
+
+            <!-- Quick Jump Pills -->
+            <div class="quick-jump-container mt-3 pt-2 border-top">
+                <span class="quick-jump-label"><i class="fas fa-bolt text-warning me-1"></i> Quick Jump:</span>
+                <button type="button" class="quick-jump-pill active" data-preset="london">
+                    <i class="fas fa-landmark"></i> London / Westminster
+                </button>
+                <button type="button" class="quick-jump-pill" data-preset="manchester">
+                    <i class="fas fa-city"></i> Manchester
+                </button>
+                <button type="button" class="quick-jump-pill" data-preset="birmingham">
+                    <i class="fas fa-building"></i> Birmingham
+                </button>
+                <button type="button" class="quick-jump-pill" data-preset="leeds">
+                    <i class="fas fa-subway"></i> Leeds
+                </button>
+                <button type="button" class="quick-jump-pill" data-preset="bristol">
+                    <i class="fas fa-water"></i> Bristol
+                </button>
+                <button type="button" class="quick-jump-pill" data-preset="liverpool">
+                    <i class="fas fa-ship"></i> Liverpool
+                </button>
+                <button type="button" class="quick-jump-pill" data-preset="newcastle">
+                    <i class="fas fa-bridge"></i> Newcastle
+                </button>
+                <button type="button" class="quick-jump-pill" data-preset="cardiff">
+                    <i class="fas fa-castle"></i> Cardiff
+                </button>
+                <button type="button" class="quick-jump-pill" data-preset="sheffield">
+                    <i class="fas fa-industry"></i> Sheffield
+                </button>
+                <button type="button" class="quick-jump-pill" data-preset="nottingham">
+                    <i class="fas fa-tree"></i> Nottingham
+                </button>
+
+                <!-- Additional Forces Dropdown -->
+                <div class="ms-auto mt-2 mt-md-0">
+                    <select class="form-select form-select-sm" id="preset-forces-select" style="min-width: 170px;">
+                        <option value="" disabled selected>More UK Forces & Cities...</option>
+                        <option value="cambridge">Cambridge Centre</option>
+                        <option value="oxford">Oxford City Centre</option>
+                        <option value="london">Metropolitan Police (London)</option>
+                        <option value="manchester">Greater Manchester Police</option>
+                        <option value="birmingham">West Midlands Police</option>
+                        <option value="leeds">West Yorkshire Police</option>
+                        <option value="bristol">Avon and Somerset Police</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats Bar -->
+<div class="row g-3 mb-4">
+    <!-- Stat 1: Total Crimes -->
+    <div class="col-md-6 col-lg-3">
+        <div class="stats-bar-card" style="border-left-color: #3b82f6;">
+            <div class="stat-icon-wrapper bg-primary bg-opacity-10 text-primary">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-label">Total Crimes Loaded</div>
+                <div class="stat-value" id="stat-total-crimes">--</div>
+                <div class="stat-sub">Street incidents in radius</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat 2: Top Crime Category -->
+    <div class="col-md-6 col-lg-3">
+        <div class="stats-bar-card" style="border-left-color: #ef4444;">
+            <div class="stat-icon-wrapper bg-danger bg-opacity-10 text-danger">
+                <i class="fas fa-chart-pie"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-label">Top Category</div>
+                <div class="stat-value text-danger" id="stat-top-category">--</div>
+                <div class="stat-sub">Most frequent offence</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat 3: Area Name -->
+    <div class="col-md-6 col-lg-3">
+        <div class="stats-bar-card" style="border-left-color: #10b981;">
+            <div class="stat-icon-wrapper bg-success bg-opacity-10 text-success">
+                <i class="fas fa-map-marked-alt"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-label">Current Area</div>
+                <div class="stat-value text-success" id="stat-area-name">London (Westminster)</div>
+                <div class="stat-sub">Geocoded location</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat 4: Reporting Period -->
+    <div class="col-md-6 col-lg-3">
+        <div class="stats-bar-card" style="border-left-color: #8b5cf6;">
+            <div class="stat-icon-wrapper bg-purple bg-opacity-10 text-primary" style="color: #8b5cf6 !important;">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-label">Reporting Period</div>
+                <div class="stat-value" id="stat-date-period">Latest available</div>
+                <div class="stat-sub">Official data.police.uk</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Category Filter Pills Bar -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="category-filter-wrapper">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="small fw-bold text-muted text-uppercase">
+                    <i class="fas fa-filter text-primary me-1"></i> Filter by Category:
+                </span>
+                <span id="results-status" class="small text-muted" role="status" aria-live="polite"></span>
+            </div>
+            <div id="category-filter-container">
+                <div class="text-muted small"><i class="fas fa-spinner fa-spin me-1"></i> Loading crime categories...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Interactive Map & Side Inspector Row -->
+<div class="row g-4 mb-5">
+    <!-- Map Section (Left) -->
+    <div class="col-lg-8 col-xl-8">
+        <div class="map-wrapper">
+            <!-- Instruction badge on map -->
+            <div class="map-badge-instruction">
+                <i class="fas fa-mouse-pointer text-warning me-1"></i> Click anywhere on the map to query crimes for that location
+            </div>
+
+            <!-- Loading Spinner Overlay -->
+            <div class="map-loading-overlay" id="map-loader">
+                <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="fw-bold text-dark fs-5" id="map-loader-text">Loading street-level crime data...</div>
+                <small class="text-muted mt-1">Connecting to official Police UK API</small>
+            </div>
+
+            <!-- The Leaflet Map Container -->
+            <div id="crime-map"></div>
+        </div>
+    </div>
+
+    <!-- Side Inspector Panel (Right) -->
+    <div class="col-lg-4 col-xl-4">
+        <div class="inspector-card">
+            <div class="inspector-header d-flex align-items-center justify-content-between">
+                <div>
+                    <h5 class="mb-0 fs-6 fw-bold text-white">
+                        <i class="fas fa-magnifying-glass-chart text-info me-2"></i>Crime Inspector
+                    </h5>
+                    <small class="text-light opacity-75">Street-level incident details</small>
+                </div>
+                <span class="badge bg-primary rounded-pill px-2 py-1">
+                    <i class="fas fa-shield-alt"></i> Official
+                </span>
+            </div>
+            <div class="inspector-body" id="inspector-body">
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-map-pin fa-3x mb-3 text-secondary opacity-50"></i>
+                    <h6 class="fw-bold">No Crime Selected</h6>
+                    <p class="small text-muted">Click any crime marker on the map to inspect its street location, category, and investigation outcome.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Navigation to Other Portal Features -->
+<div class="row mt-2">
+    <div class="col-12 mb-3">
+        <h4 class="fw-bold text-dark"><i class="fas fa-th-large text-primary me-2"></i>Explore More Police Data</h4>
+    </div>
     <div class="col-md-3 mb-4">
         <div class="card text-white bg-success h-100">
-            <div class="card-body text-center">
-                <h4><i class="fas fa-building"></i></h4>
+            <div class="card-body text-center p-4">
+                <h4><i class="fas fa-building mb-2"></i></h4>
                 <h5>Police Forces</h5>
-                <p>Explore all UK police forces</p>
-                <a href="{{ url_for('forces') }}" class="btn btn-light">View Forces</a>
+                <p class="small opacity-90">Explore all 43+ territorial UK police forces and senior officers</p>
+                <a href="{{ url_for('forces') }}" class="btn btn-light btn-sm fw-bold">View Forces</a>
             </div>
         </div>
     </div>
     <div class="col-md-3 mb-4">
         <div class="card text-white bg-warning h-100">
-            <div class="card-body text-center">
-                <h4><i class="fas fa-exclamation-triangle"></i></h4>
-                <h5>Crime Data</h5>
-                <p>Street-level crime information</p>
-                <a href="{{ url_for('crimes') }}" class="btn btn-light">Search Crimes</a>
+            <div class="card-body text-center p-4">
+                <h4><i class="fas fa-exclamation-triangle mb-2"></i></h4>
+                <h5>Crime Data Search</h5>
+                <p class="small opacity-90">Tabular search and raw data query for street crimes</p>
+                <a href="{{ url_for('crimes') }}" class="btn btn-light btn-sm fw-bold">Search Crimes</a>
             </div>
         </div>
     </div>
     <div class="col-md-3 mb-4">
         <div class="card text-white bg-info h-100">
-            <div class="card-body text-center">
-                <h4><i class="fas fa-users"></i></h4>
+            <div class="card-body text-center p-4">
+                <h4><i class="fas fa-users mb-2"></i></h4>
                 <h5>Neighbourhoods</h5>
-                <p>Local policing teams</p>
-                <a href="{{ url_for('neighbourhoods') }}" class="btn btn-light">Explore</a>
+                <p class="small opacity-90">Find your local policing team and community priorities</p>
+                <a href="{{ url_for('neighbourhoods') }}" class="btn btn-light btn-sm fw-bold">Explore Teams</a>
             </div>
         </div>
     </div>
     <div class="col-md-3 mb-4">
         <div class="card text-white bg-dark h-100">
-            <div class="card-body text-center">
-                <h4><i class="fas fa-search"></i></h4>
+            <div class="card-body text-center p-4">
+                <h4><i class="fas fa-search mb-2"></i></h4>
                 <h5>Stop & Search</h5>
-                <p>Stop and search records</p>
-                <a href="{{ url_for('stop_search') }}" class="btn btn-light">View Data</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5><i class="fas fa-search"></i> Quick Crime Search</h5>
-            </div>
-            <div class="card-body">
-                <form id="quick-search">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <input type="text" class="form-control mb-2" id="lat" placeholder="Latitude" value="51.5074">
-                        </div>
-                        <div class="col-md-6">
-                            <input type="text" class="form-control mb-2" id="lng" placeholder="Longitude" value="-0.1278">
-                        </div>
-                    </div>
-                    <input type="month" class="form-control mb-2" id="date" value="2024-01">
-                    <button type="submit" class="btn btn-primary w-100">Search Crimes</button>
-                </form>
-                <div id="results" class="mt-3"></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5><i class="fas fa-info-circle"></i> About</h5>
-            </div>
-            <div class="card-body">
-                <p>This application provides easy access to official UK police data including:</p>
-                <ul>
-                    <li>Police force information</li>
-                    <li>Street-level crime data</li>
-                    <li>Neighbourhood policing</li>
-                    <li>Stop and search records</li>
-                </ul>
-                <p class="mb-0">All data is sourced from the official Police UK API.</p>
+                <p class="small opacity-90">Audit stop and search transparency and ethnicity stats</p>
+                <a href="{{ url_for('stop_search') }}" class="btn btn-light btn-sm fw-bold">View Data</a>
             </div>
         </div>
     </div>
@@ -97,23 +301,10 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-document.getElementById('quick-search').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const lat = document.getElementById('lat').value;
-    const lng = document.getElementById('lng').value;
-    const date = document.getElementById('date').value;
-    
-    fetch(`/api/crimes/street?lat=${lat}&lng=${lng}&date=${date}`)
-        .then(r => r.json())
-        .then(crimes => {
-            const results = document.getElementById('results');
-            if (crimes.length > 0) {
-                results.innerHTML = `<div class="alert alert-success">Found ${crimes.length} crimes</div>`;
-            } else {
-                results.innerHTML = '<div class="alert alert-warning">No crimes found</div>';
-            }
-        });
-});
-</script>
+<!-- Leaflet & MarkerCluster JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+<!-- Custom Interactive Map Script -->
+<script src="{{ url_for('static', filename='js/home_map.js') }}"></script>
 {% endblock %}

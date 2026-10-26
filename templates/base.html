@@ -9,28 +9,34 @@
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
-                <i class="fas fa-shield-alt"></i> Police Data UK
+            <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">
+                <i class="fas fa-shield-alt me-1"></i> Police Data UK
             </a>
-            <div class="navbar-nav">
-                <a class="nav-link" href="{{ url_for('index') }}"><i class="fas fa-home"></i> Dashboard</a>
-                <a class="nav-link" href="{{ url_for('forces') }}"><i class="fas fa-building"></i> Forces</a>
-                <a class="nav-link" href="{{ url_for('crimes') }}"><i class="fas fa-exclamation-triangle"></i> Crimes</a>
-                <a class="nav-link" href="{{ url_for('neighbourhoods') }}"><i class="fas fa-users"></i> Neighbourhoods</a>
-                <a class="nav-link" href="{{ url_for('stop_search') }}"><i class="fas fa-search"></i> Stop & Search</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="{{ url_for('index') }}"><i class="fas fa-home"></i> Dashboard</a>
+                    <a class="nav-link" href="{{ url_for('forces') }}"><i class="fas fa-building"></i> Forces</a>
+                    <a class="nav-link" href="{{ url_for('crimes') }}"><i class="fas fa-exclamation-triangle"></i> Crimes</a>
+                    <a class="nav-link" href="{{ url_for('neighbourhoods') }}"><i class="fas fa-users"></i> Neighbourhoods</a>
+                    <a class="nav-link" href="{{ url_for('stop_search') }}"><i class="fas fa-search"></i> Stop & Search</a>
+                    <a class="nav-link" href="{{ url_for('analytics') }}"><i class="fas fa-chart-line"></i> Analytics</a>
+                </div>
             </div>
         </div>
     </nav>
 
-    <main class="container mt-4">
+    <main class="container mt-4" id="main-content">
         {% block content %}{% endblock %}
     </main>
 
     <footer class="bg-dark text-light mt-5 py-4">
         <div class="container text-center">
-            <p>Police Data UK Portal &copy; 2024 | Data Source: <a href="https://data.police.uk" class="text-light">Police UK API</a></p>
+            <p>Police Data UK Portal | Data Source: <a href="https://data.police.uk" class="text-light" target="_blank" rel="noopener">Police UK API</a></p>
         </div>
     </footer>
 

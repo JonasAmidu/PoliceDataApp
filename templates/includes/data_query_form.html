@@ -1,0 +1,25 @@
+<form id="dataQueryForm" class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        {% if include_force %}
+        <div class="row g-3 mb-3">
+            <div class="col-md-4"><label for="queryMode" class="form-label">Search area</label><select id="queryMode" class="form-select"><option value="location">Near a location</option><option value="force">Entire police force</option></select></div>
+            <div class="col-md-8" id="forceFields" hidden><label for="queryForce" class="form-label">Police force</label><select id="queryForce" class="form-select"><option value="">Loading forces…</option></select></div>
+        </div>
+        {% endif %}
+        <fieldset id="locationFields">
+            <legend class="fs-6 fw-bold">Choose a location</legend>
+            <label for="locationQuery" class="form-label">UK postcode or place</label>
+            <div class="input-group mb-2"><input id="locationQuery" class="form-control" placeholder="e.g. SW1A 1AA or Leicester" autocomplete="off"><button id="findLocation" type="button" class="btn btn-outline-primary">Find location</button></div>
+            <div id="locationMatches" class="list-group mb-2" aria-live="polite"></div>
+            <p id="selectedLocation" class="text-muted small">Central London selected. Search for another place or enter coordinates.</p>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6"><label for="queryLat" class="form-label">Latitude</label><input id="queryLat" class="form-control" type="number" step="any" min="-90" max="90" value="51.5074" required></div>
+                <div class="col-md-6"><label for="queryLng" class="form-label">Longitude</label><input id="queryLng" class="form-control" type="number" step="any" min="-180" max="180" value="-0.1278" required></div>
+            </div>
+        </fieldset>
+        <div class="row g-3 align-items-end">
+            <div class="col-md-6"><label for="queryMonth" class="form-label">Month</label><input id="queryMonth" type="month" class="form-control" min="2010-12"><div id="monthHint" class="form-text">Leave blank to use the latest published data.</div></div>
+            <div class="col-md-6"><button id="loadData" type="submit" class="btn btn-primary w-100">{{ query_button }}</button></div>
+        </div>
+    </div>
+</form>
