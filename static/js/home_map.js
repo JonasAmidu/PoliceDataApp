@@ -136,21 +136,11 @@
             preferCanvas: true
         });
 
-        // Base tile layers
-        const cartoVoyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
-            maxZoom: 19
-        }).addTo(map);
-
-        const osmStandard = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        // Standard OpenStreetMap tiles are available without an API key.
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             maxZoom: 19
-        });
-
-        L.control.layers({
-            "Light Clean Map": cartoVoyager,
-            "Standard OpenStreetMap": osmStandard
-        }, null, { position: 'topright' }).addTo(map);
+        }).addTo(map);
 
         L.control.scale({ imperial: true, metric: true, position: 'bottomleft' }).addTo(map);
 

@@ -13,6 +13,8 @@ python app.py
 
 Open http://localhost:5000. Python 3.10 or newer is supported. The web pages load Bootstrap, Leaflet, MarkerCluster and Chart.js from public CDNs, so an internet connection is required. `setup.py` is the original project generator and rewrites application files; use the commands above to run this version.
 
+The map uses standard OpenStreetMap tiles, with visible attribution and no API key. Normal browser caching is preserved; see the [tile usage policy](https://operations.osmfoundation.org/policies/tiles/).
+
 ## Browser views
 
 - **Dashboard:** search UK postcodes or place names, jump to a city, use your location, or select coordinates on the map. Incidents cluster as you zoom; category filters and the inspector show street names and recorded outcomes.
