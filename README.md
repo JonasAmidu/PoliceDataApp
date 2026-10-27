@@ -2,6 +2,22 @@
 
 A Flask web interface for the [UK Police Data API](https://data.police.uk/docs/), with an interactive crime map, police force directory, neighbourhood profiles, stop-and-search records, and crime analytics.
 
+## In-app experience
+
+[Explore the live app](https://lionfish-app-dslpv.ondigitalocean.app/).
+
+### Find crimes by location
+
+Search by UK postcode or place, choose a reporting month, or jump to a city. Summary cards show the number of incidents, leading crime category, selected area, and reporting period.
+
+![Location search for Luton with a reporting month, city shortcuts, and crime summary cards](PoliceDataAppScreenshot1.png)
+
+### Inspect individual incidents
+
+Select a crime marker to view its street location and recorded outcome in the map popup and Crime Inspector.
+
+![Crime map with an incident popup and Crime Inspector showing the street, recorded outcome, and reporting month](PoliceDataAppScreenshot.png)
+
 ## Run locally
 
 ```bash
