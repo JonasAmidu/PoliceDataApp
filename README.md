@@ -40,6 +40,7 @@ curl --fail http://localhost:8080/health
 ## Browser views
 
 - **Dashboard:** search UK postcodes or place names, jump to a city, use your location, or select coordinates on the map. Incidents cluster as you zoom; category filters and the inspector show street names and recorded outcomes.
+- **Crimes:** use the same postcode/place lookup and location-selection form as Analytics and Stop & Search, then search a reporting month and read street names and outcomes. Coordinates can also be entered directly.
 - **Forces:** search the directory, open a force's contact details in a modal, then follow its neighbourhood link.
 - **Neighbourhoods:** browse and filter local areas, then inspect the overview, policing team, priorities, and events. Partial upstream failures appear as warnings.
 - **Stop & Search:** choose a location or police force and reporting month. View summaries, filter by search object, and page through records, including records without published coordinates.

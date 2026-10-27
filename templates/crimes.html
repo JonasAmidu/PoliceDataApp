@@ -2,27 +2,10 @@
 {% block title %}Crime Search - Police Data UK{% endblock %}
 {% block content %}
 <h1 class="h2"><i class="fas fa-exclamation-triangle text-primary me-2"></i>Crime Data</h1>
-<p class="lead">Search street-level crimes near a location. Coordinates are approximate to protect privacy.</p>
+<p class="lead">Find street-level crimes by UK postcode or place. Coordinates are approximate to protect privacy.</p>
 <div class="row g-4 mt-2">
     <div class="col-md-4">
-        <div class="card"><div class="card-body">
-            <form id="crime-search">
-                <div class="mb-3">
-                    <label for="lat" class="form-label">Latitude</label>
-                    <input type="number" step="any" min="-90" max="90" required class="form-control" id="lat" value="51.5074">
-                </div>
-                <div class="mb-3">
-                    <label for="lng" class="form-label">Longitude</label>
-                    <input type="number" step="any" min="-180" max="180" required class="form-control" id="lng" value="-0.1278">
-                </div>
-                <div class="mb-3">
-                    <label for="date" class="form-label">Month</label>
-                    <input type="month" class="form-control" id="date">
-                    <div class="form-text">Leave blank for the latest available data.</div>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Search Crimes</button>
-            </form>
-        </div></div>
+        {% set include_force = false %}{% set query_button = 'Search Crimes' %}{% include 'includes/data_query_form.html' %}
     </div>
     <div class="col-md-8">
         <div class="card"><div class="card-body">
@@ -32,5 +15,6 @@
 </div>
 {% endblock %}
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/subpage_common.js') }}"></script>
 <script src="{{ url_for('static', filename='js/crimes.js') }}"></script>
 {% endblock %}
