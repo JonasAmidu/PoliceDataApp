@@ -4,9 +4,13 @@ import re
 from datetime import date as calendar_date
 
 from flask import Flask, jsonify, render_template, request
+from dotenv import load_dotenv
+
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 from config import Config
 from utils.police_api import PoliceDataAPI, UpstreamAPIError
+from utils.telemetry import init_app as init_telemetry
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -170,6 +174,14 @@ def api_stop_search_street():
 def api_analytics_summary():
     lat, lng, date, force = query_filters(default_location=True, allow_force=True)
     return jsonify(police_api.get_crime_summary(lat=lat, lng=lng, date=date, force=force))
+
+
+init_telemetry(app)
+
+# Optional local extension. Its implementation and settings are provisioned privately.
+if os.path.isfile(os.path.join(app.root_path, 'private_admin', '__init__.py')):
+    from private_admin import init_app
+    init_app(app)
 
 
 if __name__ == '__main__':

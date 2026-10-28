@@ -94,6 +94,48 @@ Successful upstream responses, including empty lists, are cached in memory for 6
 
 Postcodes use [Postcodes.io](https://postcodes.io/); place searches use [Nominatim](https://nominatim.org/) and are submitted explicitly, with OpenStreetMap attribution. Nominatim requests are cached and limited to one per second within the application process. For a deployment with multiple workers, coordinate rate limiting across processes or use a suitable geocoding provider. Set `NOMINATIM_SEARCH_URL` to switch to a compatible search service. Follow the provider's [usage policy](https://operations.osmfoundation.org/policies/nominatim/).
 
+## Optional application telemetry
+
+The production collector is disabled until `TELEMETRY_DATABASE_URL` is set. It
+does not add an admin route. The collector records request counts, server-handler
+timings, status codes, route patterns, and coarse browser/device categories.
+Presence uses a random identifier in the tab's session storage; no tracking cookies,
+fingerprinting, IP addresses, query strings, search terms or precise locations are
+stored. Do Not Track and Global Privacy Control disable session presence. Anonymous
+request counts still contribute to performance metrics.
+
+To enable it, initialize a PostgreSQL database with
+`TELEMETRY_DATABASE_URL=... python -m utils.telemetry_store` using a setup account,
+then give the runtime account `SELECT, INSERT, UPDATE, DELETE` on the three
+`telemetry_*` tables and `USAGE` on their schema. Configure its connection string
+as the encrypted **runtime** variable `TELEMETRY_DATABASE_URL` in DigitalOcean's
+web-service settings. Keep credentials out of repository files. Remote database
+connections require TLS; connection strings can specify `sslmode=verify-full` and
+`sslrootcert` for certificate verification. No database connection is made during
+build, import, app startup, health checks, or normal request handling.
+
+When enabled, a small deferred first-party script sends at most one presence
+request per minute from a visible, online tab after page load. Storage-disabled
+browsers skip presence. The script never displays UI, changes the map, or blocks
+application requests. The server uses one daemon writer per worker, a queue of
+at most 2,048 events, batches of at most 128, and at most 100 accepted events per
+second per worker. The writer flushes every two seconds and backs off for 5–60
+seconds on database failures. Full queues, overload, outages and process exits
+can drop metrics; telemetry is best-effort, not an audit log. Failure logs omit
+connection details. `TELEMETRY_ENABLED=0` disables collection completely.
+
+Request history is aggregated by route, method, status and minute. Response
+percentiles are estimates from fixed latency buckets. Recent errors are route/minute
+groups, without error bodies. Sessions and minute aggregates have seven-day
+retention, with bounded background cleanup. A PostgreSQL database preserves data
+across App Platform container replacements; local SQLite files cannot provide
+that persistence. See [DigitalOcean storage limits](https://docs.digitalocean.com/products/app-platform/details/limits/).
+
+This repository's `.do/app.yaml` currently defines a web service only. It does not
+provision a database or supply telemetry credentials. Attaching a database and
+configuring runtime variables are separate DigitalOcean account operations; pushing
+code does not create them. The application works normally before they are set.
+
 ## Verification
 
 Backend and JavaScript regression checks run without upstream network access:
@@ -101,8 +143,12 @@ Backend and JavaScript regression checks run without upstream network access:
 ```bash
 python -m unittest discover -s tests -p 'test_*.py' -v
 python tests/deployment_smoke.py
-node --test tests/test_home_map.js tests/test_subpages.js
+node --test tests/test_home_map.js tests/test_subpages.js tests/test_telemetry.js
 ```
+
+The PostgreSQL integration tests run against the isolated `police_telemetry_test`
+database when `TELEMETRY_TEST_DATABASE_URL` is set. CI provides PostgreSQL 16;
+otherwise those database-only checks are skipped.
 
 The deployment smoke check starts Gunicorn and the Python entrypoint on assigned ports and probes `/health` and `/`; it requires permission to bind local sockets. Node.js 22 or newer is required for the JavaScript tests. In restricted environments that prevent test subprocesses, add `--experimental-test-isolation=none` to the Node command.
 

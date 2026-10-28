@@ -9,6 +9,20 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: police_telemetry_test
+          POSTGRES_USER: telemetry_test
+          POSTGRES_PASSWORD: telemetry_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U telemetry_test -d police_telemetry_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TELEMETRY_TEST_DATABASE_URL: postgresql://telemetry_test:telemetry_test@localhost:5432/police_telemetry_test?sslmode=disable
     strategy:
       matrix:
         python-version: ['3.10', '3.11', '3.12']
@@ -27,7 +41,7 @@ jobs:
       - name: Verify server startup and health checks
         run: python tests/deployment_smoke.py
       - name: Run JavaScript regression tests
-        run: node --test tests/test_home_map.js tests/test_subpages.js
+        run: node --test tests/test_home_map.js tests/test_subpages.js tests/test_telemetry.js
 
   browser:
     runs-on: ubuntu-latest

@@ -104,3 +104,6 @@ venv.bak/
 .idea/
 *.swp
 *.swo
+
+# Local-only administration, credentials and telemetry
+/private_admin/
