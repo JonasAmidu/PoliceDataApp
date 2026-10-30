@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Overview · Police Data Operations</title>
+  <link rel="stylesheet" href="{{ base }}/panel.css">
+  <script src="{{ base }}/panel.js" defer></script>
+</head>
+<body data-base="{{ base }}">
+  <aside class="sidebar">
+    <a class="brand" href="{{ base }}"><span class="brand-mark" aria-hidden="true">P<span>·</span></span><span>Police Data<small>OPERATIONS</small></span></a>
+    <p class="nav-label">WORKSPACE</p>
+    <nav aria-label="Operations"><a class="nav-link selected" href="#overview"><span aria-hidden="true">▦</span> Overview <span class="nav-dot"></span></a><a class="nav-link" href="#visitors"><span aria-hidden="true">◎</span> Live sessions</a><a class="nav-link" href="#performance"><span aria-hidden="true">↗</span> Performance</a><a class="nav-link" href="#errors"><span aria-hidden="true">⊙</span> Error log</a></nav>
+    <div class="sidebar-bottom"><div class="private-label"><span class="lock-icon" aria-hidden="true">◇</span> Private workspace<small>Administrator access</small></div><form action="{{ base }}/logout" method="post"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="logout" type="submit">Sign out <span aria-hidden="true">↗</span></button></form></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><span>Workspace <span class="breadcrumb-separator">/</span> <strong>Overview</strong></span><span class="private-badge" id="source-badge">PRIVATE</span></header>
+    <main id="overview">
+      <div class="page-heading"><div><p class="eyebrow">APPLICATION TELEMETRY</p><h1>Operations overview<span>.</span></h1><p class="muted">A live pulse of your users, traffic, and application health.</p></div><div class="heading-tools"><span class="live-status" id="live-status"><i></i> Connecting</span><select id="range" aria-label="Telemetry time range"><option value="1">Last hour</option><option value="24" selected>Last 24 hours</option><option value="168">Last 7 days</option></select></div></div>
+      <div id="load-error" class="error-message banner" role="alert" hidden></div>
+      <section class="metrics" aria-label="Key metrics">
+        <article class="metric"><div class="metric-label">Active sessions <span class="metric-icon">◎</span></div><strong id="active-count">—</strong><div class="metric-foot"><span class="green-dot"></span> Active in the last 5 minutes</div></article>
+        <article class="metric"><div class="metric-label">Unique sessions <span class="metric-icon">♧</span></div><strong id="visitor-count">—</strong><div class="metric-foot">Anonymous browser tabs in this period</div></article>
+        <article class="metric"><div class="metric-label">Total requests <span class="metric-icon">↗</span></div><strong id="request-count">—</strong><div class="metric-foot"><span id="pageview-count">—</span> page views</div></article>
+        <article class="metric"><div class="metric-label">Average response <span class="metric-icon">◷</span></div><strong id="latency-count">—</strong><div class="metric-foot">95th percentile ≈ <span id="p95-count">—</span></div></article>
+      </section>
+      <section class="traffic-grid">
+        <article class="panel traffic-panel"><div class="panel-heading"><div><h2>Traffic over time</h2><p>Application requests, grouped by hour</p></div><span class="chart-legend"><i></i> Requests <i class="error-key"></i> Errors</span></div><div class="chart-container" id="chart" aria-label="Request activity chart"></div><div class="chart-footer"><span id="chart-period">Waiting for activity</span><span>Hourly intervals · UTC</span></div></article>
+        <article class="panel health-panel"><div class="panel-heading"><h2>Application health</h2><span class="panel-icon">↗</span></div><div class="health-indicator"><span class="health-ring" id="health-ring">✓</span><h3 id="health-title">Waiting for telemetry</h3><p id="health-description">Checking request history</p></div><dl class="health-details"><div><dt>Error rate</dt><dd id="error-rate">—</dd></div><div><dt>Server errors</dt><dd id="server-errors">—</dd></div><div><dt>Worker uptime</dt><dd id="uptime">—</dd></div><div><dt>Telemetry storage</dt><dd id="storage">—</dd></div></dl></article>
+      </section>
+      <section class="panel" id="visitors"><div class="panel-heading"><div><h2>Live sessions <span class="count-badge" id="session-badge">0</span></h2><p>Browser tabs seen in the last five minutes · up to 100 shown</p></div><span class="subtle-tag">Refreshes every 15s</span></div><div class="table-scroll"><table><thead><tr><th>Session</th><th>Current page</th><th>Browser</th><th>Operating system</th><th>Device</th><th>Last seen</th></tr></thead><tbody id="sessions-body"><tr><td colspan="6" class="empty">Waiting for telemetry…</td></tr></tbody></table></div></section>
+      <section class="breakdowns-grid" aria-label="Browser and device information"><article class="panel"><div class="panel-heading"><h2>Browsers</h2><span class="panel-icon">◉</span></div><div id="browser-breakdown" class="breakdown-list"></div></article><article class="panel"><div class="panel-heading"><h2>Operating systems</h2><span class="panel-icon">▣</span></div><div id="system-breakdown" class="breakdown-list"></div></article><article class="panel"><div class="panel-heading"><h2>Devices</h2><span class="panel-icon">▤</span></div><div id="device-breakdown" class="breakdown-list"></div></article></section>
+      <section class="bottom-grid"><article class="panel" id="performance"><div class="panel-heading"><div><h2>Route performance</h2><p>Most requested application routes</p></div></div><div class="table-scroll"><table><thead><tr><th>Route</th><th>Requests</th><th>Avg. response</th><th>Errors</th></tr></thead><tbody id="routes-body"></tbody></table></div></article><article class="panel" id="errors"><div class="panel-heading"><div><h2>Recent errors</h2><p>Latest 30 failing route/minute groups</p></div><span class="count-badge" id="errors-badge">0</span></div><div class="table-scroll"><table><thead><tr><th>Status</th><th>Route</th><th>Time (UTC)</th></tr></thead><tbody id="errors-body"></tbody></table></div></article></section>
+      <footer class="page-footer"><p><span class="green-dot"></span> First-party telemetry · Seven-day retention</p><p>No accounts exist in this app. Sessions are anonymous browser tabs. Do Not Track is honoured.<br>Queries, IP addresses, precise locations, and raw user agents are never stored.</p><p id="last-updated" aria-live="polite">Waiting for first update</p></footer>
+    </main>
+  </div>
+</body>
+</html>

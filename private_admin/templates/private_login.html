@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Sign in · Police Data Operations</title>
+  <link rel="stylesheet" href="{{ url_for('private_admin.asset', asset='panel.css') }}">
+</head>
+<body class="login-body">
+  <main class="login-card">
+    <div class="brand-mark" aria-hidden="true">P<span>·</span></div>
+    <p class="eyebrow">POLICE DATA / OPERATIONS</p>
+    <h1>A private view of<br>your application.</h1>
+    <p class="muted">Sign in to view live activity and application health.</p>
+    <form method="post">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <label for="password">Admin password</label>
+      <input id="password" type="password" name="password" autocomplete="current-password" required autofocus maxlength="1024">
+      {% if error %}<p class="error-message" role="alert">{{ error }}</p>{% endif %}
+      <button class="primary-button" type="submit">Open operations panel <span aria-hidden="true">↗</span></button>
+    </form>
+    <p class="login-footer">Private access · Session expires after one hour</p>
+  </main>
+</body>
+</html>

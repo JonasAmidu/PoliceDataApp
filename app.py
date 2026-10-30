@@ -193,10 +193,9 @@ def api_analytics_summary():
 
 init_telemetry(app)
 
-# Optional local extension. Its implementation and settings are provisioned privately.
-if os.path.isfile(os.path.join(app.root_path, 'private_admin', '__init__.py')):
-    from private_admin import init_app
-    init_app(app)
+# The panel registers routes only when private runtime credentials are configured.
+from private_admin import init_app as init_admin
+init_admin(app)
 
 
 if __name__ == '__main__':

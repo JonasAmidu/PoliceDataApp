@@ -105,5 +105,25 @@ venv.bak/
 *.swp
 *.swo
 
-# Local-only administration, credentials and telemetry
-/private_admin/
+# Publish only reviewed panel source; credentials, databases and previews stay private.
+/private_admin/*
+!/private_admin/__init__.py
+!/private_admin/panel.css
+!/private_admin/panel.js
+!/private_admin/configure.py
+!/private_admin/provision_database.py
+!/private_admin/verify_production.py
+!/private_admin/connect-digitalocean.sh
+!/private_admin/README.md
+!/private_admin/test_private_admin.py
+!/private_admin/browser_smoke.py
+!/private_admin/templates/
+/private_admin/templates/*
+!/private_admin/templates/private_login.html
+!/private_admin/templates/private_dashboard.html
+.env.*
+!.env.example
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*

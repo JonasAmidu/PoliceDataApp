@@ -117,7 +117,7 @@ Postcodes use [Postcodes.io](https://postcodes.io/); place searches use [Nominat
 ## Optional application telemetry
 
 The production collector is disabled until `TELEMETRY_DATABASE_URL` is set. It
-does not add an admin route. The collector records request counts, server-handler
+records request counts, server-handler
 timings, status codes, route patterns, and coarse browser/device categories.
 Presence uses a random identifier in the tab's session storage; no tracking cookies,
 fingerprinting, IP addresses, query strings, search terms or precise locations are
@@ -156,12 +156,29 @@ provision a database or supply telemetry credentials. Attaching a database and
 configuring runtime variables are separate DigitalOcean account operations; pushing
 code does not create them. The application works normally before they are set.
 
+## Admin panel and PostgreSQL
+
+The repository includes an authenticated operations panel at `/admin` when runtime
+admin credentials are configured. View live sessions, traffic, response times and
+errors from the same PostgreSQL database used by the collector. The panel stays
+disabled until a signing secret and password/hash are supplied, and reports missing
+database configuration explicitly. Credentials, generated access files and
+telemetry data are excluded from Git.
+
+See [panel setup and security](private_admin/README.md). For DigitalOcean, run
+`bash private_admin/connect-digitalocean.sh` to attach a persistent database, create
+scoped accounts, generate admin settings and configure encrypted runtime variables.
+For your own local PostgreSQL, use `compose.postgres.yaml` with a private
+`POSTGRES_PASSWORD` in `.env`. Creating hosted resources and setting deployment
+credentials are separate from publishing the code.
+
 ## Verification
 
 Backend and JavaScript regression checks run without upstream network access:
 
 ```bash
 python -m unittest discover -s tests -p 'test_*.py' -v
+python -m unittest discover -s private_admin -p 'test_*.py' -v
 python tests/deployment_smoke.py
 node --test tests/test_home_map.js tests/test_subpages.js tests/test_telemetry.js
 ```

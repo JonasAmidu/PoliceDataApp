@@ -1,0 +1,21 @@
+# Optional self-hosted/local PostgreSQL. Store POSTGRES_PASSWORD in ignored .env.
+services:
+  telemetry-db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: police_telemetry
+      POSTGRES_USER: police_owner
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your ignored .env file}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - telemetry-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U police_owner -d police_telemetry"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  telemetry-postgres:
