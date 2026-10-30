@@ -2,6 +2,7 @@ import math
 import os
 import re
 from datetime import date as calendar_date
+from urllib.parse import urlsplit
 
 from flask import Flask, jsonify, render_template, request
 from dotenv import load_dotenv
@@ -100,6 +101,20 @@ def stop_search():
 @app.route('/analytics')
 def analytics():
     return render_template('analytics.html')
+
+
+@app.route('/goodies')
+def goodies():
+    price = os.environ.get('GOODIES_PRICE', '').strip()
+    checkout_url = os.environ.get('GOODIES_CHECKOUT_URL', '').strip()
+    try:
+        checkout = urlsplit(checkout_url)
+        checkout_ready = bool(price and checkout.scheme == 'https' and checkout.hostname
+                              and not checkout.username and not checkout.password)
+    except ValueError:
+        checkout_ready = False
+    return render_template('goodies.html', price=price, checkout_url=checkout_url,
+                           checkout_ready=checkout_ready)
 
 
 @app.route('/api/geocode/postcode')

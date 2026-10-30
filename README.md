@@ -61,8 +61,28 @@ curl --fail http://localhost:8080/health
 - **Neighbourhoods:** browse and filter local areas, then inspect the overview, policing team, priorities, and events. Partial upstream failures appear as warnings.
 - **Stop & Search:** choose a location or police force and reporting month. View summaries, filter by search object, and page through records, including records without published coordinates.
 - **Analytics:** choose a location and reporting month to view category/outcome charts and the corresponding tables.
+- **Goodies:** preview the Nosey Neighbours sheet of six different 70 mm avatar QR-code stickers and support the app when ordering opens.
 
 Month selectors use the latest published crime month. A blank month lets the upstream API choose its latest data. Coverage and publication dates vary by force and dataset; an empty response means no published records for that query. Crime coordinates are anonymised and approximate.
+
+## Goodies and sticker purchases
+
+`/goodies` shows the six-design sticker sheet and is linked from the main navigation
+and footer. The artwork comes from the B&S Labels mixed-sheet proof dated
+28 October 2026. It is a design preview, not a guarantee of the final print.
+
+The page defaults to **Coming soon**, with pricing to be confirmed and ordering
+disabled while the first batch is being arranged. To open sales once stock and
+fulfilment are ready, set both runtime environment variables:
+
+- `GOODIES_PRICE`: the displayed price per sheet, including currency (for example,
+  `£5.00`; this is an illustration, not the agreed selling price).
+- `GOODIES_CHECKOUT_URL`: the full HTTPS URL of your hosted product checkout.
+
+Configure the actual price, sheet quantity, shipping charges, delivery information,
+and shipping-address collection in the payment provider's checkout. The app links
+to that checkout; it does not collect payments or store orders. The displayed price
+must match the checkout price. Remove `GOODIES_CHECKOUT_URL` to pause sales.
 
 ## Application API
 

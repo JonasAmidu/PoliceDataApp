@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Goodies | Support Police Data UK{% endblock %}
+
+{% block content %}
+<section class="goodies-intro mb-4" aria-labelledby="goodies-title">
+    <p class="goodies-eyebrow mb-2"><i class="fas fa-heart me-2" aria-hidden="true"></i>Support Police Data UK</p>
+    <h1 id="goodies-title" class="display-5 fw-bold mb-3">Meet your Nosey Neighbours.</h1>
+    <p class="lead mb-0">Six curious characters. One sticker sheet. A way to help keep our crime data app free to explore.</p>
+</section>
+
+<div class="row g-4 align-items-start">
+    <div class="col-lg-8">
+        <figure class="goodies-sheet mb-0" aria-labelledby="sheet-caption">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <span class="fw-bold">The Nosey Neighbours collection</span>
+                <span class="goodies-detail">6 designs · 1 sheet</span>
+            </div>
+            <img src="{{ url_for('static', filename='images/goodies/nosey-neighbours-sheet.png') }}"
+                 class="img-fluid goodies-artwork" width="1176" height="797"
+                 alt="Sheet of six round avatar QR-code stickers in two rows of three: a man in a flat cap, a woman in a headscarf, a woman with a cat, a man in a baseball cap, a woman with a dog, and a man in a turban.">
+            <figcaption id="sheet-caption" class="small text-muted mt-3">Design preview. Final printed stickers may vary slightly.</figcaption>
+        </figure>
+    </div>
+    <div class="col-lg-4">
+        <section class="card goodies-order" aria-labelledby="sticker-title">
+            <div class="card-body p-4">
+                {% if checkout_ready %}
+                <span class="goodies-status goodies-status-ready mb-3">Available now</span>
+                {% else %}
+                <span class="goodies-status mb-3">Coming soon</span>
+                {% endif %}
+                <h2 id="sticker-title" class="h3 fw-bold">Nosey Neighbours sticker sheet</h2>
+                <p class="text-muted">A whole neighbourhood of avatar stickers, each holding a QR code. Keep a favourite and share the rest.</p>
+                <ul class="goodies-features list-unstyled my-4">
+                    <li><i class="fas fa-check" aria-hidden="true"></i>Six different stickers on every sheet</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>70 mm round sticker designs</li>
+                    <li><i class="fas fa-check" aria-hidden="true"></i>Purchases help fund Police Data UK</li>
+                </ul>
+                <div class="border-top pt-3 mb-3">
+                    <p class="small text-muted mb-1">Per sheet of 6 stickers</p>
+                    <p class="h4 fw-bold mb-0">{{ price if price else 'Price to be confirmed' }}</p>
+                </div>
+                {% if checkout_ready %}
+                <a href="{{ checkout_url }}" class="btn btn-primary btn-lg w-100" target="_blank" rel="noopener noreferrer">Buy a sheet of 6 <i class="fas fa-arrow-up-right-from-square ms-2" aria-hidden="true"></i><span class="visually-hidden"> (opens checkout in a new tab)</span></a>
+                <p class="small text-muted mt-3 mb-0">Review delivery costs and details at checkout before paying.</p>
+                {% else %}
+                <button class="btn btn-secondary btn-lg w-100" type="button" disabled>Stickers coming soon</button>
+                <p class="small text-muted mt-3 mb-0">We’re getting the first batch ready. Ordering will open here once stock, pricing and delivery details are confirmed.</p>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+
+<section class="goodies-support mt-4 p-4" aria-labelledby="support-title">
+    <div class="row g-3 align-items-center">
+        <div class="col-md-8">
+            <h2 id="support-title" class="h5 fw-bold">Small stickers. Useful support.</h2>
+            <p class="mb-0">Your purchase will help cover hosting and development, so we can keep making public police data easier to explore. Thanks for supporting an independent project.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-primary">Explore the crime map <i class="fas fa-arrow-right ms-2" aria-hidden="true"></i></a>
+        </div>
+    </div>
+</section>
+{% endblock %}

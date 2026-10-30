@@ -26,6 +26,7 @@
                     <a class="nav-link" href="{{ url_for('neighbourhoods') }}"><i class="fas fa-users"></i> Neighbourhoods</a>
                     <a class="nav-link" href="{{ url_for('stop_search') }}"><i class="fas fa-search"></i> Stop & Search</a>
                     <a class="nav-link" href="{{ url_for('analytics') }}"><i class="fas fa-chart-line"></i> Analytics</a>
+                    <a class="nav-link" href="{{ url_for('goodies') }}"><i class="fas fa-gift" aria-hidden="true"></i> Goodies</a>
                 </div>
             </div>
         </div>
@@ -41,6 +42,7 @@
             <div class="d-flex flex-wrap justify-content-center align-items-center gap-3">
                 <span>Created by <a href="https://github.com/JonasAmidu" class="text-light" target="_blank" rel="author noopener noreferrer">Jonas Amidu</a></span>
                 <a href="https://github.com/JonasAmidu/PoliceDataApp" class="text-light" target="_blank" rel="noopener noreferrer"><i class="fab fa-github me-1" aria-hidden="true"></i>Contribute on GitHub</a>
+                <a href="{{ url_for('goodies') }}" class="text-light">Support us with stickers</a>
             </div>
         </div>
     </footer>

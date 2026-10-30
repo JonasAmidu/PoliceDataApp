@@ -3,6 +3,76 @@ body {
     color: #2d3748;
 }
 
+/* Supporter sticker collection */
+.goodies-intro {
+    max-width: 800px;
+    padding: 1.5rem 0 0.75rem;
+}
+
+.goodies-eyebrow {
+    color: #1d4ed8;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.goodies-sheet {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    padding: clamp(1rem, 3vw, 1.75rem);
+}
+
+.goodies-detail {
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+.goodies-artwork {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+}
+
+.goodies-order:hover {
+    transform: none;
+}
+
+.goodies-status {
+    display: inline-block;
+    border-radius: 2rem;
+    padding: 0.35rem 0.75rem;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.goodies-status-ready {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.goodies-features li {
+    display: flex;
+    gap: 0.65rem;
+    align-items: baseline;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.goodies-features i {
+    color: #1d4ed8;
+}
+
+.goodies-support {
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    border-radius: 1rem;
+}
+
 .jumbotron {
     background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
     border-radius: 1rem;
